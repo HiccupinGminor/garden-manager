@@ -73,10 +73,11 @@ int emergency_status_pin = 13;
 int moisture_reading;
 int moisture_reading_2;
 int n = 10;
+int allowed_timeout = 60000;
 
-long reading_delay = 60000;
+long reading_delay = 10000;
 
-long broadcast_multiple = 30;
+long broadcast_multiple = 3;
 int period_counter = 0;
 
 void setup(void)
@@ -165,6 +166,21 @@ void loop(void)
   
   if(period_counter == broadcast_multiple) {
       
+      pingWebService(moisture_reading);
+  }
+  
+  delay(reading_delay);
+}
+
+///**************************************************************************/
+///*!
+//    @brief  Begins an SSID scan and prints out all the visible networks
+//*/
+///**************************************************************************/
+
+void pingWebService(int moisture_reading) 
+{
+      int timer = millis();
       Serial.print(F("\nAttempting to connect to ")); Serial.println(WLAN_SSID);
       if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
         Serial.println(F("Failed!"));
@@ -234,17 +250,7 @@ void loop(void)
       /* the next time your try to connect ... */
       Serial.println(F("\n\nDisconnecting"));
       cc3000.disconnect();
-  }
-  
-  delay(reading_delay);
 }
-
-///**************************************************************************/
-///*!
-//    @brief  Begins an SSID scan and prints out all the visible networks
-//*/
-///**************************************************************************/
-
 //void listSSIDResults(void)
 //{
 //  uint32_t index;
